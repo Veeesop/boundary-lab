@@ -18,10 +18,11 @@ def run_import(code):
 
 def test_default_uses_package_client_contract_and_paths():
     process = run_import("""
-from beat_engine import EngineWorker, engine_paths
+from beat_engine import EngineWorker, __version__, engine_paths
 from blab.solvers import beat_engine_runtime as runtime, engine_contract
+assert __version__ == '0.4.0rc1'
 assert issubclass(runtime.BeatEngineWorkerProcess, EngineWorker)
-for backend in ('cpu', 'cuda', 'rocm'):
+for backend in ('cpu', 'cuda', 'rocm', 'metal'):
     assert runtime.default_beat_engine_project(backend) == engine_paths(backend).project
 assert engine_contract.validate_solve_request.__module__.startswith('beat_engine.')
 assert runtime.BeatEngineWorkerProcess._prepare_submission is EngineWorker._prepare_submission
@@ -52,4 +53,16 @@ sys.modules['beat_engine'] = engine
 import blab.solvers.engine_distribution
 """)
     assert process.returncode != 0
-    assert "requires beat-engine 0.2.0; found 0.0.0" in process.stderr
+    assert "requires beat-engine 0.4.0rc1; found 0.0.0" in process.stderr
+
+
+def test_previous_engine_version_is_rejected():
+    process = run_import("""
+import sys, types
+engine = types.ModuleType('beat_engine')
+engine.__version__ = '0.2.0'
+sys.modules['beat_engine'] = engine
+import blab.solvers.engine_distribution
+""")
+    assert process.returncode != 0
+    assert "requires beat-engine 0.4.0rc1; found 0.2.0" in process.stderr

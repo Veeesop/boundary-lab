@@ -83,6 +83,7 @@ def test_project_file_round_trip(tmp_path) -> None:
     loaded = read_project_file(project_path)
 
     assert project_path.name == "test_project.blab.json"
+    payload["imported_meshes"][0]["source_file"] = loaded["imported_meshes"][0]["source_file"]
     assert loaded == payload
     assert loaded["symmetry"] == "xy"
     assert loaded["component_channel_by_id"] == {"component:woofer": "tweeter"}

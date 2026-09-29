@@ -137,6 +137,16 @@ def test_hidden_solver_preferences_always_use_backend_defaults() -> None:
     assert "preferences/use_burton_miller" not in saved.values
 
 
+def test_metal_backend_is_explicit_and_persists_while_cpu_remains_default() -> None:
+    defaults = load_gui_preferences(MemorySettings())
+    assert defaults.solve_backend == "beat_cpu"
+
+    saved = MemorySettings()
+    save_gui_preferences(saved, GuiPreferences(solve_backend="beat_metal"))
+    assert saved.values["preferences/solve_backend"] == "beat_metal"
+    assert load_gui_preferences(saved).solve_backend == "beat_metal"
+
+
 def test_preference_change_classification() -> None:
     baseline = GuiPreferences()
 
