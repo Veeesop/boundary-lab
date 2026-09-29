@@ -36,6 +36,15 @@ def test_catalog_backends_round_trip_without_starting_workers(qapp, monkeypatch,
         dialog.close()
 
 
+def test_metal_catalog_advertises_exterior_and_coupled_solve_support():
+    metal = next(info for info in backend_catalog() if info.backend_id == "metal")
+
+    assert "exterior_bem" in metal.solve_kinds
+    assert "coupled_fem_bem_lem" in metal.solve_kinds
+    assert registry.backend_label_to_id()[metal.label] == "beat_metal"
+    assert registry.supports_physical_system_solves("beat_metal")
+
+
 def test_future_engine_backend_needs_no_application_list_update(monkeypatch):
     from beat_engine import backends
 
@@ -75,12 +84,17 @@ def test_backend_failure_is_emitted_only_when_solve_runs(qapp, monkeypatch):
     project = load_headless_project(Path(__file__).parent / "fixtures/remote-exterior.blab.json")
     prepared = prepare_headless_solve(project, HeadlessSolveSpec(frequencies_hz=(500.0,)), backend_id="beat_metal")
     worker = SystemSolveWorker(prepared)
+    dialog = PreferencesDialog(GuiPreferences(solve_backend="beat_metal"))
     errors = []
     worker.failed.connect(errors.append)
     assert attempts == []
     assert errors == []
-    worker.run()
-    assert attempts == [True]
-    assert len(errors) == 1
-    assert "BEAT Engine (Apple Metal) could not run the solve" in errors[0]
-    assert "Runtime/device" in errors[0]
+    try:
+        worker.run()
+        assert attempts == [True]
+        assert len(errors) == 1
+        assert "BEAT Engine (Apple Metal) could not run the solve" in errors[0]
+        assert "Runtime/device" in errors[0]
+        assert dialog.preferences().solve_backend == "beat_metal"
+    finally:
+        dialog.close()

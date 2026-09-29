@@ -31,6 +31,18 @@ While not required, if modeling in Autodesk Fusion, the [Fusion2Msh](https://git
    instructed so Windows can refresh the available commands.
 4. Double-click `02_start_boundary_lab.bat` to launch Boundary Lab.
 
+## Apple Silicon source setup
+
+Boundary Lab can run BEAT Engine Metal from source on Apple Silicon. See the
+[macOS installation steps](docs/Installation%20and%20Setup.md#macos-apple-silicon)
+for Python and Julia setup, Metal verification, backend selection, and the
+qualified exterior and coupled solve examples. Preferences continue to default
+to BEAT CPU; select BEAT Metal explicitly when you want to use it.
+
+Ath geometry generation on macOS runs through Wine. You can instead import a
+Gmsh mesh, including one exported with Fusion2Msh; details are in the
+[installation guide](docs/Installation%20and%20Setup.md#ath-geometry-generation-on-macos).
+
 
 ## Solver Requirements
 

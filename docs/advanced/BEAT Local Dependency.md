@@ -1,7 +1,7 @@
 # BEAT Engine dependency
 
 Boundary Lab requires the independently released `beat-engine` package. Its
-`pyproject.toml` pins the `v0.2.0` wheel URL and SHA-256, so ordinary installation
+`pyproject.toml` pins the `v0.4.0rc1` wheel URL and SHA-256, so ordinary installation
 downloads and verifies that exact artifact without a sibling engine checkout:
 
 ```text
@@ -12,8 +12,10 @@ python -m beat_engine paths --backend cpu
 ```
 
 Julia is installed separately; the wheel does not provide Julia or GPU drivers.
-Use `--backend cuda` or `--backend rocm` to prepare the corresponding environment.
-Hardware availability is a separate qualification from successful installation.
+Use `--backend cpu`, `cuda`, `rocm`, or `metal` to prepare the corresponding
+environment. Metal is available only on Apple Silicon macOS. Hardware
+availability is a separate qualification from successful installation; inspect
+`python -m beat_engine doctor --backend metal --threads 2` before selecting it.
 
 Run these commands with Boundary Lab's Python environment activated. On Windows,
 you can instead use `.\.venv\Scripts\python.exe` in place of `python`. Installing
@@ -47,8 +49,13 @@ packages. Previous Julia package downloads may be reused from the local depot;
 the installed release's own project still needs to be instantiated. Restart
 Boundary Lab after updating so existing workers do not retain the old engine.
 
-The release is [v0.2.0](https://github.com/JWSound/BEAT_Engine/releases/tag/v0.2.0).
+The pinned release is
+[v0.4.0rc1](https://github.com/Veeesop/BEAT_Engine/releases/tag/v0.4.0rc1).
 It contains wheel and source distributions. No PyPI publication is configured.
+This prerelease adds the Metal worker catalog entry; Boundary Lab has manually
+qualified one exterior BEM fixture and one coupled FEM-BEM example on Apple
+Silicon. See [macOS installation](../Installation%20and%20Setup.md#macos-apple-silicon)
+for the exact test scope and source workflow.
 The compiled-system contract, worker negotiation, transport, numerical sources,
 and fixtures belong to BEAT Engine. Boundary Lab owns project compilation,
 backend/SDK selection policy, GUI/CLI integration, and result models.
@@ -75,8 +82,11 @@ Reinstalling Boundary Lab may restore the pinned release; use a separate virtual
 environment for engine development. To restore the release explicitly:
 
 ```text
-python -m pip install --force-reinstall --no-deps "beat-engine @ https://github.com/JWSound/BEAT_Engine/releases/download/v0.2.0/beat_engine-0.2.0-py3-none-any.whl#sha256=bccad47b9647e5f4f7bc1ca6ac9d22e2e7751f1f39046fadc1e5e9782a282ad1"
+python -m pip install --force-reinstall --no-deps "beat-engine @ https://github.com/Veeesop/BEAT_Engine/releases/download/v0.4.0rc1/beat_engine-0.4.0rc1-py3-none-any.whl#sha256=8bba352f925a709fe9aa8546c50dc1f173cf6f2b5b9ea479300cf0c9fb25b267"
 ```
+
+Rerunning the regular editable Boundary Lab install also restores its declared
+engine pin.
 
 ## Updating the engine
 

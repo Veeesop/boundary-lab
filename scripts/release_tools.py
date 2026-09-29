@@ -11,6 +11,10 @@ import urllib.request
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+BEAT_RELEASE_WHEEL = re.compile(
+    r"beat-engine @ https://github.com/Veeesop/BEAT_Engine/releases/download/v\d+\.\d+\.\d+(?:rc\d+)?/"
+    r"beat_engine-[^/]+\.whl#sha256=[0-9a-f]{64}"
+)
 
 
 def check(tag):
@@ -23,10 +27,7 @@ def check(tag):
         raise ValueError(f"Missing release notes: {notes}")
     dependencies = project.get("dependencies", [])
     beat = next((d for d in dependencies if d.startswith("beat-engine")), None)
-    if beat and not re.fullmatch(
-        r"beat-engine @ https://github.com/JWSound/BEAT_Engine/releases/download/v\d+\.\d+\.\d+(?:rc\d+)?/beat_engine-[^/]+\.whl#sha256=[0-9a-f]{64}",
-        beat,
-    ):
+    if beat and not BEAT_RELEASE_WHEEL.fullmatch(beat):
         raise ValueError("Releases require a published BEAT wheel with a SHA-256 pin.")
     desktop = ROOT / "desktop/package.json"
     if desktop.exists():
